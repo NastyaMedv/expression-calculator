@@ -44,10 +44,10 @@ function expressionCalculator(expr) {    // write your solution here
   // counting function for all operations
   function count(a,b,c) {
     switch (c) {
-      case '+': return (+a+b);
-      case '-': return (a-b);
-      case '*': return (a*b);
-      case '/': return (a/b);
+      case '+': return (+a+b).toFixed(14);
+      case '-': return (a-b).toFixed(14);
+      case '*': return (a*b).toFixed(14);
+      case '/': return (a/b).toFixed(14);
       default: return null; break;
     }
   }
@@ -115,12 +115,11 @@ function expressionCalculator(expr) {    // write your solution here
 
   //main calculation function
   function calculation(expr) {
-//console.log(expr)
+
     let i = 0;                        // dealing with brackets
 
     while (i<expr.length) {
       if (isOpen(expr[i])) {
-//console.log('((  ')
         let end = findBacketEnd(expr.substring(i));
         let result = calculation(expr.substr(i+1,end-2));
         let exprStart = expr.substring(0,i);
@@ -129,8 +128,6 @@ function expressionCalculator(expr) {    // write your solution here
           result = result.slice(1);
         }
         expr = exprStart + result + expr.substring(i+end);
-
-//console.log('))  ')
       } else {
         i++;
       }
@@ -146,7 +143,6 @@ function expressionCalculator(expr) {    // write your solution here
         let result = count(+expr.substr(i-numberA,numberA),+expr.substr(i+1,numberB),expr[i]);
         expr = expr.substring(0,i-numberA) + result + expr.substring(i+numberB+1);
         i-= numberA;
-//console.log('*  ',expr);
       } else {
         i++;
       }
@@ -162,7 +158,6 @@ function expressionCalculator(expr) {    // write your solution here
         let result = count(numberA,+expr.substr(i+1,numberB),expr[i]);
         expr = result + expr.substring(i+numberB+1);
         i = (expr[0]=='-') ? 1 : 0;
-//console.log('+  ',expr);
       } else {
         i++;
       }
