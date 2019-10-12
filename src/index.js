@@ -5,19 +5,32 @@ function eval() {
 
 function expressionCalculator(expr) {    // write your solution here
 
-  expr = expr.split(' ').join('');      //removing spacebars
+  //removing spacebars
+  expr = expr.split(' ').join('');
 
-  if (expr.indexOf('/0')!=-1)           // division by zero check
+
+  // division by zero check
+  if (expr.indexOf('/0')!=-1)
     throw new SyntaxError('TypeError: Division by zero.');
 
-  function check(str) {                 // brackets check
+
+  // brackets check
+  function isOpen(s) {
+    return (s == '(') ? true : false;
+  }
+
+  function isClosed(s) {
+    return (s == ')') ? true : false;
+  }
+
+  function check(str) {
     let stek = [];
     for (let i = 0; i < str.length; i++) {
-      if (str[i] == '(')
+      if (isOpen(str[i]))
         stek[stek.length] = str[i];
-        else if (str[i] == ')')
-          if (stek[stek.length-1] == '(')
-            stek.length = stek.length - 1;
+        else if (isClosed(str[i]))
+          if (isOpen(stek[stek.length-1]))
+            stek.length--;
             else stek[stek.length] = str[i];
     }
     return (stek.length <= 0) ? true : false;
@@ -26,7 +39,10 @@ function expressionCalculator(expr) {    // write your solution here
   if (!check(expr))
     throw new SyntaxError('ExpressionError: Brackets must be paired');
 
-  function count(a,b,c) {             // counting function for all operations
+
+
+  // counting function for all operations
+  function count(a,b,c) {
     switch (c) {
       case '+': return (+a+b);
       case '-': return (a-b);
@@ -36,15 +52,20 @@ function expressionCalculator(expr) {    // write your solution here
     }
   }
 
-  function isFirst(str) {           // check for first operations * and /
+
+
+  // check for first operations * and /
+  function isFirst(str) {
     return ((str=='*')||(str=='/')) ? true : false;
   }
 
-  function isSecond(str) {           // check for second operations + and -
+  // check for second operations + and -
+  function isSecond(str) {
     return ((str=='+')||(str=='-')) ? true : false;
   }
 
-  function findRight(str) {         // searching right number
+  // searching number right from sing
+  function findRight(str) {
     let i = 0;
     while ((!isFirst(str[i]))&&(!isSecond(str[i]))) {
       i++;
@@ -53,6 +74,7 @@ function expressionCalculator(expr) {    // write your solution here
     return i;
   }
 
+  // searching number left from sign
   function findLeft(str) {        // searching left number
     let i = str.length - 1;
     while ((!isFirst(str[i]))&&(!isSecond(str[i]))) {
@@ -62,8 +84,39 @@ function expressionCalculator(expr) {    // write your solution here
     return str.length - i - 1;
   }
 
+
+  // searching for end of current brackets
+  function findBacketEnd(str) {
+    let stek = 1, i =1;
+    for (i = 1; i < str.length; i++) {
+      if (isOpen(str[i]))  { stek++; }
+        else { if (isClosed(str[i])) stek--; }
+      if (stek == 0) break;
+    }
+    return i+1;
+  }
+
+
+
+  //main calculation function
   function calculation(expr) {
-    let i = 0;
+
+    let i = 0;                        // dealing with brackets
+//console.log(expr)
+    while (i<expr.length) {
+      if (isOpen(expr[i])) {
+        let end = findBacketEnd(expr.substring(i));
+        let result = calculation(expr.substr(i+1,end-2));
+        console.log(result);
+        expr = expr.substring(0,i) + result + expr.substring(i+end);
+//console.log(expr)
+      } else {
+        i++;
+      }
+    }
+
+
+    i = 0;                            // calculating * and / operations
 
     while (i<expr.length) {
       if (isFirst(expr[i])) {
@@ -78,7 +131,8 @@ function expressionCalculator(expr) {    // write your solution here
       }
     }
 
-    i = (expr[0]=='-') ? 1 : 0;
+
+    i = (expr[0]=='-') ? 1 : 0;     // calculating + and - operations
 
     while (i<expr.length) {
       if (isSecond(expr[i])) {
