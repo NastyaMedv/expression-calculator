@@ -97,19 +97,40 @@ function expressionCalculator(expr) {    // write your solution here
   }
 
 
+  // handling /- , *- , +-  and -- exceptions
+  function plusMinus(s) {
+    if (s == '+') return '-';
+      else return '+';
+  }
+  function moveMinus(str,index) {
+    for (let i=str.length-1; i>=0; i--) {
+      if (isSecond(str[i])) {
+        return str.substring(0,i) + plusMinus(str[i]) + str.substring(i+1);
+      }
+    }
+    return '-' + str;
+  }
+
+
 
   //main calculation function
   function calculation(expr) {
-
-    let i = 0;                        // dealing with brackets
 //console.log(expr)
+    let i = 0;                        // dealing with brackets
+
     while (i<expr.length) {
       if (isOpen(expr[i])) {
+//console.log('((  ')
         let end = findBacketEnd(expr.substring(i));
         let result = calculation(expr.substr(i+1,end-2));
-        console.log(result);
-        expr = expr.substring(0,i) + result + expr.substring(i+end);
-//console.log(expr)
+        let exprStart = expr.substring(0,i);
+        if (result[0] == '-') {
+          exprStart = moveMinus(exprStart,i);
+          result = result.slice(1);
+        }
+        expr = exprStart + result + expr.substring(i+end);
+
+//console.log('))  ')
       } else {
         i++;
       }
@@ -125,7 +146,7 @@ function expressionCalculator(expr) {    // write your solution here
         let result = count(+expr.substr(i-numberA,numberA),+expr.substr(i+1,numberB),expr[i]);
         expr = expr.substring(0,i-numberA) + result + expr.substring(i+numberB+1);
         i-= numberA;
-//console.log(expr);
+//console.log('*  ',expr);
       } else {
         i++;
       }
@@ -141,7 +162,7 @@ function expressionCalculator(expr) {    // write your solution here
         let result = count(numberA,+expr.substr(i+1,numberB),expr[i]);
         expr = result + expr.substring(i+numberB+1);
         i = (expr[0]=='-') ? 1 : 0;
-//console.log(expr);
+//console.log('+  ',expr);
       } else {
         i++;
       }
